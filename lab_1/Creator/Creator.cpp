@@ -1,4 +1,5 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
+#include <windows.h>
 #include <iostream>
 #include <fstream>
 #include <Windows.h>
@@ -8,36 +9,46 @@
 
 using namespace std;
 
-DWORD WINAPI Creator(LPVOID lpParam) {
-    Params1* params1_obj = reinterpret_cast<Params1*>(lpParam);
-
-    ofstream binInput(params1_obj->fileName, ios::binary);
-
-    if (!binInput.is_open()) {
-        cerr << "dead";
-        return 0;
+int main(int argc, char* argv[]) {
+    if (argc < 3) {
+        cout << "Usage: Creator.exe <n> <binary_filename>" << endl;
+        return 1;
     }
 
-    for (int i = 0; i < params1_obj->n; i++) {
+    int n = atoi(argv[1]);
+    const char* fileName = argv[2];
+
+    employee* employees = new employee[n];
+
+    ofstream binOutput(fileName, ios::binary);
+    if (!binOutput.is_open()) {
+        cerr << "Error opening file: " << fileName << endl;
+        delete[] employees;
+        return 1;
+    }
+
+    for (int i = 0; i < n; i++) {
         cout << "Enter employee " << i + 1 << ":\n";
 
         cout << "Number: ";
-        cin >> params1_obj->employeeArray[i].num;
+        cin >> employees[i].num;
 
         cout << "Name: ";
         cin.ignore();
-        cin.getline(params1_obj->employeeArray[i].name, 50);
+        cin.getline(employees[i].name, 50);
 
         cout << "Hours: ";
-        cin >> params1_obj->employeeArray[i].hours;
+        cin >> employees[i].hours;
 
-        binInput.write(reinterpret_cast<char*>(&params1_obj->employeeArray[i].num), sizeof(int));
-        binInput.write(params1_obj->employeeArray[i].name, sizeof(params1_obj->employeeArray[i].name));
-        binInput.write(reinterpret_cast<char*>(&params1_obj->employeeArray[i].hours), sizeof(double));
+        binOutput.write(reinterpret_cast<char*>(&employees[i].num), sizeof(int));
+        binOutput.write(employees[i].name, sizeof(employees[i].name));
+        binOutput.write(reinterpret_cast<char*>(&employees[i].hours), sizeof(double));
 
-        cout << "Success!" << endl;
+        cout << "Success!\n";
     }
 
-    binInput.close();
+    binOutput.close();
+    delete[] employees;
+
     return 0;
 }

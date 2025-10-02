@@ -9,44 +9,52 @@
 
 using namespace std;
 
-DWORD WINAPI Reporter(LPVOID lpParam) {
-    Params2* params2_obj = reinterpret_cast<Params2*>(lpParam);
-
-    ifstream binInput(params2_obj->fileNameBin, ios::binary);
-
-    if (!binInput.is_open()) {
-        cout << "Error opening file! " << params2_obj->fileNameBin << endl;
+int main(int argc, char* argv[]) {
+    if (argc < 3) {
+        cout << "Usage: Reporter.exe <n> <binary_filename>" << endl;
         return 1;
     }
 
-    cout << "Text filname: ";
-    cin.ignore();
-    cin.getline(params2_obj->fileNameReport, 100);
+    int n = atoi(argv[1]);
+    const char* fileNameBin = argv[2];
 
-    ofstream Output(params2_obj->fileNameReport);
+    employee* employees = new employee[n];
 
+    ifstream binInput(fileNameBin, ios::binary);
+    if (!binInput.is_open()) {
+        cout << "Error opening file: " << fileNameBin << endl;
+        delete[] employees;
+        return 1;
+    }
+
+    cout << "Text filename: ";
+    char fileNameReport[100];
+    cin.getline(fileNameReport, 100);
+
+    ofstream Output(fileNameReport);
     if (!Output.is_open()) {
-        cout << "Error opening file! " << params2_obj->fileNameReport << endl;
+        cout << "Error opening file: " << fileNameReport << endl;
+        delete[] employees;
         return 1;
     }
 
     cout << "Payment for hour: ";
-    cin >> params2_obj->hourPayment;
+    float hourPayment;
+    cin >> hourPayment;
 
-    Output << "Number" << "\t" << "Name" << "\t" << "Hours" << "\t" << "Bill" << "\n";
+    Output << "Number\tName\tHours\tBill\n";
 
-    for (int i = 0; i < params2_obj->n; i++) {
-        binInput.read(reinterpret_cast<char*>(&params2_obj->employeeArray[i]), sizeof(employee));
+    for (int i = 0; i < n; ++i) {
+        binInput.read(reinterpret_cast<char*>(&employees[i]), sizeof(employee));
 
-        Output << params2_obj->employeeArray[i].num << "\t";
-        Output.write(params2_obj->employeeArray[i].name, countWithoutSpaces(params2_obj->employeeArray[i].name));
-        Output << "\t";
-        Output << params2_obj->employeeArray[i].hours << "\t";
-        Output << params2_obj->employeeArray[i].hours * params2_obj->hourPayment << "\n";
+        Output << employees[i].num << "\t";
+        Output.write(employees[i].name, countWithoutSpaces(employees[i].name));
+        Output << "\t" << employees[i].hours << "\t" << employees[i].hours * hourPayment << "\n";
     }
 
     binInput.close();
     Output.close();
+    delete[] employees;
 
     return 0;
 }

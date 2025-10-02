@@ -1,0 +1,77 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\LENOVOL\\Desktop\\OS_3sem_labs\\Lab_1\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{25BF73DA-E336-4879-A4D5-EC4FC1909DC2}|Lab_1.vcxproj|C:\\Users\\LENOVOL\\Desktop\\OS_3sem_labs\\Lab_1\\Lab_1.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{25BF73DA-E336-4879-A4D5-EC4FC1909DC2}|Lab_1.vcxproj|solutionrelative:Lab_1.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{221E7A81-0AF6-4877-852B-5233FCA34C1B}|Creator\\Creator.vcxproj|C:\\Users\\LENOVOL\\Desktop\\OS_3sem_labs\\Lab_1\\Creator\\Creator.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{221E7A81-0AF6-4877-852B-5233FCA34C1B}|Creator\\Creator.vcxproj|solutionrelative:Creator\\Creator.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6545BF0D-218B-458F-8355-E3DE4CD96C84}|Reporter\\Reporter.vcxproj|C:\\Users\\LENOVOL\\Desktop\\OS_3sem_labs\\Lab_1\\Reporter\\Reporter.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6545BF0D-218B-458F-8355-E3DE4CD96C84}|Reporter\\Reporter.vcxproj|solutionrelative:Reporter\\Reporter.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Reporter.cpp",
+              "DocumentMoniker": "C:\\Users\\LENOVOL\\Desktop\\OS_3sem_labs\\Lab_1\\Reporter\\Reporter.cpp",
+              "RelativeDocumentMoniker": "Reporter\\Reporter.cpp",
+              "ToolTip": "C:\\Users\\LENOVOL\\Desktop\\OS_3sem_labs\\Lab_1\\Reporter\\Reporter.cpp",
+              "RelativeToolTip": "Reporter\\Reporter.cpp",
+              "ViewState": "AQIAAAkAAAAAAAAAAAAAAAgAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-10-02T09:09:04.152Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Creator.cpp",
+              "DocumentMoniker": "C:\\Users\\LENOVOL\\Desktop\\OS_3sem_labs\\Lab_1\\Creator\\Creator.cpp",
+              "RelativeDocumentMoniker": "Creator\\Creator.cpp",
+              "ToolTip": "C:\\Users\\LENOVOL\\Desktop\\OS_3sem_labs\\Lab_1\\Creator\\Creator.cpp",
+              "RelativeToolTip": "Creator\\Creator.cpp",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABIAAAAEAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-10-02T09:07:38.262Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Lab_1.cpp",
+              "DocumentMoniker": "C:\\Users\\LENOVOL\\Desktop\\OS_3sem_labs\\Lab_1\\Lab_1.cpp",
+              "RelativeDocumentMoniker": "Lab_1.cpp",
+              "ToolTip": "C:\\Users\\LENOVOL\\Desktop\\OS_3sem_labs\\Lab_1\\Lab_1.cpp",
+              "RelativeToolTip": "Lab_1.cpp",
+              "ViewState": "AQIAAAYAAAAAAAAAAAAAABoAAAAZAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-10-02T08:49:55.763Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
