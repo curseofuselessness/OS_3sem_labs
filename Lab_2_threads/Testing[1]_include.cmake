@@ -1,0 +1,5 @@
+if(EXISTS "C:/Users/LENOVOL/source/repos/Lab_2_threads/Testing[1]_tests.cmake")
+  include("C:/Users/LENOVOL/source/repos/Lab_2_threads/Testing[1]_tests.cmake")
+else()
+  add_test(Testing_NOT_BUILT Testing_NOT_BUILT)
+endif()

@@ -1,0 +1,4 @@
+C:/Users/LENOVOL/source/repos/Lab_2_WINAPI/CMakeFiles/ArrayModifier.dir
+C:/Users/LENOVOL/source/repos/Lab_2_WINAPI/CMakeFiles/Testing.dir
+C:/Users/LENOVOL/source/repos/Lab_2_WINAPI/CMakeFiles/edit_cache.dir
+C:/Users/LENOVOL/source/repos/Lab_2_WINAPI/CMakeFiles/rebuild_cache.dir
