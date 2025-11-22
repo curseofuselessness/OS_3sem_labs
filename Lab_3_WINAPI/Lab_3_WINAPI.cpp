@@ -1,245 +1,128 @@
-﻿#include <iostream>
-#include <windows.h>
-#include <vector>
-#include <cstdlib>
-#include <ctime>
+﻿#include <windows.h>
+#include <iostream>
 
 using namespace std;
 
-HANDLE* startEvents;
-HANDLE* terminateEvents;
-HANDLE* threadHandles;
-HANDLE continueEvent;
-HANDLE allSuspendedEvent;
-
-int* arr;
-int arraySize;
-int threadCount;
-bool* threadTerminated;
-int suspendedThreadsCount;
 CRITICAL_SECTION cs;
+HANDLE* hFinishEvent, hStartEvent, hContinueEvent, hRemoveEvent;
+volatile int n;
+volatile int rem;
+int* arr;
 
-struct ThreadParams {
 
+DWORD WINAPI marker(LPVOID nu) {
+	WaitForSingleObject(hStartEvent, INFINITE);
 
-    int threadId;
-};
+	int a, k = 0, num = (int)nu;
+	srand(num);
 
-DWORD WINAPI markerThread(LPVOID params) {
+	while (true) {
+		a = rand();
+		a %= n;
+		EnterCriticalSection(&cs);
+		if (arr[a] == 0) {
+			Sleep(5);
+			arr[a] = num;
+			k++;
+			Sleep(5);
 
-    ThreadParams* p = (ThreadParams*)params;
-    int threadId = p->threadId;
+		}
+		else {
+			cout << "Thread " << num << " marked " << k << " positions and stopped at " << a << endl;
+			LeaveCriticalSection(&cs);
 
-    WaitForSingleObject(startEvents[threadId], INFINITE);
+			SetEvent(hFinishEvent[num - 1]);
+			WaitForSingleObject(hRemoveEvent, INFINITE);
 
-    srand(threadId);
+			if (rem == int(num)) {
+				for (int i = 0; i < n; i++) {
+					if (arr[i] == num) arr[i] = 0;
+				}
+				break;
+			}
+			else {
+				ResetEvent(hFinishEvent[num - 1]);
+				WaitForSingleObject(hContinueEvent, INFINITE);
+			}
+		}
+		LeaveCriticalSection(&cs);
+	}
 
-    int markedCount = 0;
-    bool working = true;
-
-    while (working) {
-        int randomNum = rand();
-        int index = randomNum % arraySize;
-
-        if (arr[index] == 0) {
-            Sleep(5);
-            arr[index] = threadId + 1;
-            Sleep(5);
-            markedCount++;
-        }
-        else {
-            EnterCriticalSection(&cs);
-            cout << "Поток " << threadId + 1 << ": "
-                << "помечено элементов = " << markedCount << ", "
-                << "нельзя пометить индекс = " << index << endl;
-            LeaveCriticalSection(&cs);
-
-            EnterCriticalSection(&cs);
-            suspendedThreadsCount++;
-            if (suspendedThreadsCount == threadCount) {
-                SetEvent(allSuspendedEvent);
-            }
-            LeaveCriticalSection(&cs);
-
-            HANDLE waitEvents[2] = { continueEvent, terminateEvents[threadId] };
-            DWORD result = WaitForMultipleObjects(2, waitEvents, FALSE, INFINITE);
-
-            if (result == WAIT_OBJECT_0 + 1) {
-
-                EnterCriticalSection(&cs);
-
-                for (int i = 0; i < arraySize; i++) {
-
-                    if (arr[i] == threadId + 1) {
-
-                        arr[i] = 0;
-
-                    }
-
-                }
-
-                threadTerminated[threadId] = true;
-                suspendedThreadsCount--;
-                LeaveCriticalSection(&cs);
-
-                working = false;
-            }
-            else {
-
-                EnterCriticalSection(&cs);
-                suspendedThreadsCount--;
-                LeaveCriticalSection(&cs);
-
-            }
-        }
-    }
-
-    return 0;
+	SetEvent(hFinishEvent[(int)num - 1]);
+	return 0;
 }
 
-int main() {
-    setlocale(LC_ALL, "Russian");
+int main()
+{
+	DWORD* IDMarkers;
+	HANDLE* hMarkers;
+	InitializeCriticalSection(&cs);
 
-    InitializeCriticalSection(&cs);
+	int m, a;
+	cout << "Type your array size: ";
+	cin >> a;
+	n = a;
+	arr = new int[n];
+	ZeroMemory(arr, sizeof(int) * n);
 
-    cout << "Введите размерность массива: ";
-    cin >> arraySize;
+	cout << "Type amount of markers: ";
+	cin >> m;
+	hMarkers = new HANDLE[m];
+	IDMarkers = new DWORD[m];
+	hFinishEvent = new HANDLE[m];
 
-    arr = new int[arraySize];
-    for (int i = 0; i < arraySize; i++) {
-        arr[i] = 0;
-    }
+	hStartEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	if (hStartEvent == NULL) {
+		return GetLastError();
+	}
+	hContinueEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	if (hContinueEvent == NULL) {
+		return GetLastError();
+	}
+	hRemoveEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	if (hRemoveEvent == NULL) {
+		return GetLastError();
+	}
 
-    cout << "Введите количество потоков marker: ";
-    cin >> threadCount;
+	for (int i = 0; i < m; i++) {
+		hMarkers[i] = CreateThread(NULL, 0, marker, (LPVOID)(i + 1), 0, &IDMarkers[i]);
+		if (hMarkers[i] == NULL)
+			return GetLastError();
+		hFinishEvent[i] = CreateEvent(NULL, TRUE, FALSE, NULL);
+		if (hFinishEvent[i] == NULL)
+			return GetLastError();
+	}
 
-    if (threadCount <= 0 || threadCount > arraySize) {
-        cout << "Некорректное количество потоков!" << endl;
-        return 1;
-    }
+	SetEvent(hStartEvent);
 
-    startEvents = new HANDLE[threadCount];
-    terminateEvents = new HANDLE[threadCount];
-    threadHandles = new HANDLE[threadCount];
-    threadTerminated = new bool[threadCount];
+	int number = m, end;
+	while (number > 0) {
+		if (WaitForMultipleObjects(m, hFinishEvent, TRUE, INFINITE) == WAIT_FAILED)
+		{
+			cout << "Wait for multiple objects failed." << endl;
+			cout << "Press any key to exit." << endl;
+		}
+		EnterCriticalSection(&cs);
+		for (int i = 0; i < n; i++) {
+			cout << arr[i] << " ";
+		}
+		LeaveCriticalSection(&cs);
+		cout << "\nType a number of marker thar you want to delete: ";
+		cin >> end;
+		rem = end;
+		PulseEvent(hRemoveEvent);
+		WaitForSingleObject(hMarkers[rem - 1], INFINITE);
+		number--;
+		PulseEvent(hContinueEvent);
+	}
 
-    continueEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-    allSuspendedEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	for (int i = 0; i < m; i++) {
+		CloseHandle(hMarkers[i]);
+		CloseHandle(hFinishEvent[i]);
+	}
 
-    for (int i = 0; i < threadCount; i++) {
+	CloseHandle(hStartEvent);
+	DeleteCriticalSection(&cs);
 
-        startEvents[i] = CreateEvent(NULL, TRUE, FALSE, NULL);
-        terminateEvents[i] = CreateEvent(NULL, TRUE, FALSE, NULL);
-
-        threadTerminated[i] = false;
-    }
-
-    suspendedThreadsCount = 0;
-
-    ThreadParams* params = new ThreadParams[threadCount];
-
-    for (int i = 0; i < threadCount; i++) {
-
-        params[i].threadId = i;
-        threadHandles[i] = CreateThread(NULL, 0, markerThread, &params[i], 0, NULL);
-
-        if (threadHandles[i] == NULL) {
-
-            cout << "Ошибка создания потока " << i + 1 << endl;
-            return 1;
-
-        }
-    }
-
-    cout << "Все потоки созданы. Запускаем работу..." << endl;
-
-    for (int i = 0; i < threadCount; i++) {
-
-        SetEvent(startEvents[i]);
-
-    }
-
-    while (true) {
-        WaitForSingleObject(allSuspendedEvent, INFINITE);
-
-        cout << "\nТекущее состояние массива:" << endl;
-
-        for (int i = 0; i < arraySize; i++) {
-
-            cout << arr[i] << " ";
-
-        }
-
-        cout << endl;
-
-        bool allTerminated = true;
-
-        for (int i = 0; i < threadCount; i++) {
-
-            if (!threadTerminated[i]) {
-
-                allTerminated = false;
-                break;
-
-            }
-        }
-
-        if (allTerminated) {
-
-            break;
-
-        }
-
-        int threadToTerminate;
-        cout << "\nВведите номер потока для завершения (1-" << threadCount << "): ";
-        cin >> threadToTerminate;
-        threadToTerminate--;
-
-        if (threadToTerminate < 0 || threadToTerminate >= threadCount || threadTerminated[threadToTerminate]) {
-
-            cout << "Некорректный номер потока!" << endl;
-            continue;
-
-        }
-
-        SetEvent(terminateEvents[threadToTerminate]);
-
-        WaitForSingleObject(threadHandles[threadToTerminate], INFINITE);
-
-        cout << "\nСостояние массива после завершения потока " << threadToTerminate + 1 << ":" << endl;
-
-        for (int i = 0; i < arraySize; i++) {
-
-            cout << arr[i] << " ";
-
-        }
-        cout << endl;
-
-        ResetEvent(allSuspendedEvent);
-
-        SetEvent(continueEvent);
-        Sleep(100);
-        ResetEvent(continueEvent);
-    }
-
-    cout << "Все потоки завершены. Программа завершает работу." << endl;
-
-    for (int i = 0; i < threadCount; i++) {
-        CloseHandle(threadHandles[i]);
-        CloseHandle(startEvents[i]);
-        CloseHandle(terminateEvents[i]);
-    }
-
-    delete[] arr;
-    delete[] startEvents;
-    delete[] terminateEvents;
-    delete[] threadHandles;
-    delete[] threadTerminated;
-    delete[] params;
-
-    CloseHandle(continueEvent);
-    CloseHandle(allSuspendedEvent);
-    DeleteCriticalSection(&cs);
-
-    return 0;
+	return 0;
 }
